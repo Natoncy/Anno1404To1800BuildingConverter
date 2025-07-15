@@ -1,0 +1,133 @@
+﻿{
+  // Path to data folder for 1404
+  "DataPath1404": "D:\\anno_data\\1404\\",
+  // Path to data folder of the mod
+  "DataPathMod": "C:\\Users\\Max\\Documents\\Anno 1800\\mods\\[Addon] Return to the Orient\\",
+  // Path to data folder for 1800, in case you want to copy it there too
+  "DataPath1800": "D:\\anno_data\\1800\\",
+
+  // Part of original path in 1404 to be replaced by 
+  "OriginalPathPart": "data\\graphics",
+  // this in the mod folder
+  "ReplacementPathPart": "data\\graphics\\1404_import",
+
+  "AnnotexPath": "C:\\tools\\annotex.exe",
+  "Evegr2toobjPath": "C:\\tools\\evegr2toobj.exe",
+  "Rdm4binPath": "C:\\tools\\rdm4-bin.exe",
+  "BlenderPath": "C:\\Program Files\\Blender Foundation\\Blender 3.5\\blender.exe",
+  "UpscaylPath": "C:\\Program Files\\Upscayl\\resources\\bin\\upscayl-bin.exe",
+  "UpscaylModel": "ultramix-balanced-4x",
+
+  // Skips upscaling diff textures with upscayl, upscaling takes a lot of time (like double of everything else combined)
+  "SkipUpscale": true,
+
+  // Particle effects are not converted but can be replced with an 1800 particle effect
+  // Key is the path to the original 1404 particle effect
+  // Value is the path to the replacing 1800 particle effect
+  // Missing particles in the dictionary will be logged in console and can be added here
+  // If none are found then the particle will not be added
+  "ParticleMappings": {
+    "data\\graphics\\effects\\particles\\fountain_lightfoam.efc": "data\\graphics\\effects\\particles\\water\\water_fountain01.rdp",
+    "data\\graphics\\effects\\particles\\n_smoke_02.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\smoke_light_02_loop.rdp",
+    "data\\graphics\\effects\\particles\\smokewater.efc": "data\\graphics\\effects\\particles\\fire_explosion\\heat_fire_large_01_loop.rdp",
+    "data\\graphics\\effects\\particles\\melted_material_justglow.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\steam_large_light_slow_02_loop.rdp",
+    "data\\graphics\\effects\\particles\\n_mineeffect_01.efc": null, // s_copper_mine, s_gold_mine
+    "data\\graphics\\effects\\particles\\riverbuilding_stream.efc": null, // s_sugar_mill
+    "data\\graphics\\effects\\particles\\s_noria_splashpool_02.efc": null, // s_noria, s_small_noria
+    "data\\graphics\\effects\\particles\\s_noria_splashwheel.efc": null, // s_noria, s_small_noria
+    "data\\graphics\\effects\\particles\\s_noria_splashwheel_02.efc": null, // s_noria, s_small_noria
+    "data\\graphics\\effects\\particles\\unit_dust_01.efc": null // s_small_noria
+  },
+
+  // Indices of vertices of cloth that should be physically dynamic
+  // Missing vertex indices in the dictionary will be logged in console and can be added here
+  // If none are found then the all vertices will be stiff like a regular model
+  // Select the dynamic vertices then use the copySelectedVertexIndices script in blender to copy the vertex indices
+  "ClothDynamicVertices": {
+    "cloth_panel_01": [ 0, 3 ], // s_clothpanel_01, s_clothpanel_03
+    "cloth_panel_02": [ 0, 3 ], // s_clothpanel_02, s_clothpanel_04
+    "clothcube_cloth": [ 0, 3, 4, 6, 7, 8, 9, 12, 13, 15, 16, 17, 18, 21, 22, 24, 25, 26, 27, 30, 31, 33, 34, 35 ], // flagpost_01
+    "clothfence_cloth": [ 1, 2, 4, 6, 7, 8, 10, 11, 13, 15, 16, 17 ], // clothfence
+
+    "flag": [], // shipwreck_1
+    "flag_element": [], // shipwreck_element_3
+    "flag2": [], // shipwreck_2
+
+    "mil_banner_big_01": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], // mil_banner01
+    "mil_banner_big_02": [ 12, 15, 16, 18, 19, 20 ], // mil_banner02
+    "n_flag01_var01": [ 0, 1, 2, 3, 4, 6 ], // n_flag01_var01, n_flag04_var01
+    //"n_flag02_var01": [], // n_flag02_var01 ???
+    "n_flag03_var01": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], // n_flag03_var01
+
+    "s_bazaar_clothobject": [ 0, 3, 6, 9, 25, 26, 28, 31, 32, 34, 36, 37, 40, 43, 44, 46 ], // s_bazaar, s_bazaar_ambassador
+
+    "s_jugglers_camp_cloth_lod0": [ 0, 1, 4, 5, 6 ], // s_jugglers_camp
+
+    "s_nomad_house_01_cloth": [ 0, 3, 4, 6, 7, 8, 9, 12, 13, 15, 16, 17, 18, 21, 22, 24, 25, 26 ], // s_nomad_house_01
+    "s_nomad_house_02_cloth": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17 ], // s_nomad_house_02
+    "s_nomad_house_04_cloth": [ 1, 2, 4, 5 ], // s_nomad_house_04
+
+    "s_tent01_part1": [ 2, 5, 6, 8, 11, 14, 15, 17, 20, 21, 23, 26 ], // s_tent01
+    "s_tent01_part2": [ 2, 3, 5, 7, 10, 11, 12, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 34, 35, 36, 37, 39, 45, 46, 61, 62, 64, 65, 70 ], // s_tent01
+    "s_tent01_pennant_rope": [ 3, 5, 11, 13, 19, 21, 23, 25, 31, 33, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55 ], // s_tent01
+    "s_tent02_part01_lod0": [ 1, 4, 6, 7, 10, 13, 14, 16, 19, 22, 26, 27, 30, 31, 32, 37, 38, 39, 41, 42, 43, 45, 47, 49, 50, 53, 54, 57, 58, 69, 71, 76, 77, 79, 80, 82 ], // s_tent02
+    "s_tent02_part02_lod0": [ 20, 21, 24, 30, 35, 38, 43, 45, 48, 50, 52, 53, 54, 55 ], // s_tent02
+    "s_tent02_part03_lod0": [ 2, 3, 6, 7, 8, 9, 14, 15, 18, 19, 20, 21, 26, 27, 30, 31, 34, 35, 38, 39, 42, 43, 46, 47, 48, 49, 50, 51, 54, 57, 58, 59, 60, 61, 64, 65, 66, 67, 68, 69, 72, 75, 76, 77, 78, 79, 80, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 96, 97, 98, 99, 100, 101, 102, 103, 108, 109, 110, 111, 114, 115, 116, 117, 118, 119 ], // s_tent02
+    "s_tent02_part04_line01": [ 2, 3, 8, 9 ], // s_tent02
+
+    "sail": [], // shipwreck_1
+    "sail2": [], // shipwreck_2
+
+    "n_corsair_harbour_building_03_cloth": [ 1, 2, 4, 5 ], // corsair_harbour_building_03
+    "n_corsair_harbour_flags": [ 0, 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18 ], // corsair_harbour_building_03
+    "n_corsair_harbour_line02": [ 1, 2, 5, 6, 8, 13, 14, 16, 17, 19, 22, 23 ], // corsair_harbour
+    "n_corsair_harbour_lines": [ 6, 7, 14, 17, 18, 21, 22, 25, 26, 29, 36, 37, 40, 41, 44, 45, 48, 49, 52, 53, 56, 57, 58, 59, 60, 61, 62, 63 ] // corsair_harbour
+  },
+
+  // Paths to the buildings that should be converted
+  "Paths": [
+    // Orient
+    { "Path": "data\\graphics\\buildings\\factory\\south" },
+    { "Path": "data\\graphics\\buildings\\farm\\south" },
+    { "Path": "data\\graphics\\buildings\\farm\\north\\spice_farm" },
+    { "Path": "data\\graphics\\buildings\\military\\south" },
+    { "Path": "data\\graphics\\buildings\\mine\\south" },
+    { "Path": "data\\graphics\\buildings\\native\\south" },
+    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour" },
+    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_01" },
+    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_02" },
+    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_03" },
+    { "Path": "data\\graphics\\buildings\\ornament\\south" },
+    { "Path": "data\\graphics\\buildings\\public\\south" },
+    { "Path": "data\\graphics\\buildings\\residence\\south" },
+    { "Path": "data\\graphics\\buildings\\ornament\\north\\decoration_objects\\n_decoration_palm.cfg" },
+    {
+      "Path": "data\\graphics\\props",
+      "IsProp": true
+    },
+    {
+      "Path": "data\\graphics\\buildings\\native\\south\\orient_harbour_building",
+      "IsProp": true,
+      "DoNotAdjustToTerrainHeight": true
+    },
+    {
+      "Path": "data\\graphics\\buildings\\public\\south\\oriental_market_building",
+      "IsProp": true,
+      "DoNotAdjustToTerrainHeight": true
+    },
+
+    // Everything
+    //{ "Path": "data\\graphics\\buildings" },
+    //{
+    //  "Path": "data\\graphics\\props",
+    //  "IsProp": true
+    //},
+
+    // Testing
+    //{ "Path": "data\\graphics\\buildings\\residence\\south\\nomad_house" },
+
+
+
+    {}
+  ]
+}
