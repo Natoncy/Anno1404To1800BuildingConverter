@@ -2,8 +2,8 @@
   // Path to data folder for 1404
   "DataPath1404": "D:\\anno_data\\1404\\",
   // Path to data folder of the mod
-  "DataPathMod": "C:\\Users\\Max\\Documents\\Anno 1800\\mods\\[Addon] Return to the Orient\\",
-  // Path to data folder for 1800, in case you want to copy it there too
+  "DataPathMod": "C:\\Users\\User\\Documents\\Anno 1800\\mods\\[Example] Your mod\\",
+  // Path to data folder for 1800, in case you want to copy it there too (optional)
   "DataPath1800": "D:\\anno_data\\1800\\",
 
   // Part of original path in 1404 to be replaced by 
@@ -15,8 +15,8 @@
   "Evegr2toobjPath": "C:\\tools\\evegr2toobj.exe",
   "Rdm4binPath": "C:\\tools\\rdm4-bin.exe",
   "BlenderPath": "C:\\Program Files\\Blender Foundation\\Blender 3.5\\blender.exe",
-  "UpscaylPath": "C:\\Program Files\\Upscayl\\resources\\bin\\upscayl-bin.exe",
-  "UpscaylModel": "ultramix-balanced-4x",
+  "UpscaylPath": "C:\\Program Files\\Upscayl\\resources\\bin\\upscayl-bin.exe", // (optional)
+  "UpscaylModel": "ultramix-balanced-4x", // (optional)
 
   // Skips upscaling diff textures with upscayl, upscaling takes a lot of time (like double of everything else combined)
   "SkipUpscale": true,
@@ -30,13 +30,7 @@
     "data\\graphics\\effects\\particles\\fountain_lightfoam.efc": "data\\graphics\\effects\\particles\\water\\water_fountain01.rdp",
     "data\\graphics\\effects\\particles\\n_smoke_02.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\smoke_light_02_loop.rdp",
     "data\\graphics\\effects\\particles\\smokewater.efc": "data\\graphics\\effects\\particles\\fire_explosion\\heat_fire_large_01_loop.rdp",
-    "data\\graphics\\effects\\particles\\melted_material_justglow.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\steam_large_light_slow_02_loop.rdp",
-    "data\\graphics\\effects\\particles\\n_mineeffect_01.efc": null, // s_copper_mine, s_gold_mine
-    "data\\graphics\\effects\\particles\\riverbuilding_stream.efc": null, // s_sugar_mill
-    "data\\graphics\\effects\\particles\\s_noria_splashpool_02.efc": null, // s_noria, s_small_noria
-    "data\\graphics\\effects\\particles\\s_noria_splashwheel.efc": null, // s_noria, s_small_noria
-    "data\\graphics\\effects\\particles\\s_noria_splashwheel_02.efc": null, // s_noria, s_small_noria
-    "data\\graphics\\effects\\particles\\unit_dust_01.efc": null // s_small_noria
+    "data\\graphics\\effects\\particles\\melted_material_justglow.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\steam_large_light_slow_02_loop.rdp"
   },
 
   // Indices of vertices of cloth that should be physically dynamic
