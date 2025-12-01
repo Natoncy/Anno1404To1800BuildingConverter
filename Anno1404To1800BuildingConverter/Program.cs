@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.Processing;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Xml;
 using Quaternion = System.Numerics.Quaternion;
 
@@ -25,42 +26,47 @@ internal class Program
 
     static void Main(string[] args)
     {
-        var json = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "config.json"));
-        Config = JsonConvert.DeserializeObject<Config>(json)!;
-
-        var defaultCulture = new CultureInfo("en-US");
-        Thread.CurrentThread.CurrentCulture = defaultCulture;
-        Thread.CurrentThread.CurrentUICulture = defaultCulture;
-
-        Console.WriteLine($"CONVERTER STARTED");
-
-
-        foreach (var path in Config.Paths)
+        try
         {
-            if (path?.Path == null)
+            var json = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "config.json"));
+            Config = JsonConvert.DeserializeObject<Config>(json)!;
+
+            var defaultCulture = new CultureInfo("en-US");
+            Thread.CurrentThread.CurrentCulture = defaultCulture;
+            Thread.CurrentThread.CurrentUICulture = defaultCulture;
+
+            Console.WriteLine($"CONVERTER STARTED");
+
+
+            foreach (var path in Config.Paths.Where(x => x.Path != null))
             {
-                return;
+                if (path.Path.EndsWith(".cfg"))
+                {
+                    ConvertBuilding(path.Path, path.IsProp, path.DoNotAdjustToTerrainHeight);
+                }
+                else
+                {
+                    ConvertAllInFolder(path.Path, path.IsProp, path.DoNotAdjustToTerrainHeight);
+                }
             }
 
-            if (!path.Path.EndsWith(".cfg"))
+            if (!string.IsNullOrWhiteSpace(Config.DataPath1800))
             {
-                ConvertAllInFolder(path.Path, path.IsProp, path.DoNotAdjustToTerrainHeight);
+                CopyDirectory( // Optional: Copies all generated files into data folder for blender import
+                    @$"{Config.DataPathMod}{Config.ReplacementPathPart}",
+                    @$"{Config.DataPath1800}{Config.ReplacementPathPart}");
             }
-            else
-            {
-                ConvertBuilding(path.Path, path.IsProp, path.DoNotAdjustToTerrainHeight);
-            }
+
+            Console.WriteLine();
+            Console.WriteLine($"CONVERTER COMPLETED");
         }
-
-        if (!string.IsNullOrWhiteSpace(Config.DataPath1800))
+        catch (Exception ex)
         {
-            CopyDirectory( // Optional: Copies all generated files into data folder for blender import
-                @$"{Config.DataPathMod}{Config.ReplacementPathPart}",
-                @$"{Config.DataPath1800}{Config.ReplacementPathPart}");
-        }
+            Console.WriteLine("ERROR CONVERTER ERROR");
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
 
-        Console.WriteLine();
-        Console.WriteLine($"CONVERTER COMPLETED");
+        }
     }
 
     private static void ConvertAllInFolder(string folderPath, bool isProp, bool doNotAdjustToTerrainHeight)
@@ -99,22 +105,22 @@ internal class Program
             ConvertGroundMap(ground, mapsFolder);
         }
 
-        foreach (var diff in building.Models.Where(x => !x.Water).GroupBy(x => x.Diff))
+        foreach (var diff in building.Models.SelectMany(x => x.Materials).Where(x => !x.Water).GroupBy(x => x.Diff))
         {
             ConvertModelMap(diff.Key, mapsFolder, false, diff.ToList(), isProp);
         }
 
-        foreach (var norm in building.Models.Where(x => !x.Water).GroupBy(x => x.Norm))
+        foreach (var norm in building.Models.SelectMany(x => x.Materials).Where(x => !x.Water).GroupBy(x => x.Norm))
         {
             ConvertModelMap(norm.Key, mapsFolder, true, norm.ToList(), isProp);
         }
 
-        foreach (var diff in building.Clothes.GroupBy(x => x.Diff))
+        foreach (var diff in building.Clothes.SelectMany(x => x.Materials).GroupBy(x => x.Diff))
         {
             ConvertModelMap(diff.Key, mapsFolder, false, diff.ToList(), isProp);
         }
 
-        foreach (var norm in building.Clothes.GroupBy(x => x.Norm))
+        foreach (var norm in building.Clothes.SelectMany(x => x.Materials).GroupBy(x => x.Norm))
         {
             ConvertModelMap(norm.Key, mapsFolder, true, norm.ToList(), isProp);
         }
@@ -267,11 +273,7 @@ internal class Program
 					<cEmissiveColor.r>2.000000</cEmissiveColor.r>
 					<cEmissiveColor.g>2.000000</cEmissiveColor.g>
 					<cEmissiveColor.b>2.000000</cEmissiveColor.b>
-					<DIFFUSE_ENABLED>1</DIFFUSE_ENABLED>
-					<NORMAL_ENABLED>0</NORMAL_ENABLED>
-					<METALLIC_TEX_ENABLED>0</METALLIC_TEX_ENABLED>
 					<SEPARATE_AO_TEXTURE>0</SEPARATE_AO_TEXTURE>
-					<HEIGHT_MAP_ENABLED>0</HEIGHT_MAP_ENABLED>
 					<NIGHT_GLOW_ENABLED>0</NIGHT_GLOW_ENABLED>
 					<DYE_MASK_ENABLED>0</DYE_MASK_ENABLED>
 				</Config>
@@ -322,16 +324,6 @@ internal class Program
         {
             var modelPath = model.Model == null ? null : relativePathRdm + model.Model.Split("\\").Last().Replace(".gr2", ".rdm", StringComparison.OrdinalIgnoreCase);
 
-            var diffPath = model.Diff == null ? null : relativePathMaps + model.Diff.Split("\\").Last();
-            var normPath = model.Norm == null ? null : relativePathMaps + model.Norm.Split("\\").Last();
-
-            var pathTemplate = diffPath?.Replace("_diff", "_{0}") ?? diffPath?.ReplaceNormal("{0}");
-
-            var maskPath = !model.HasMask || pathTemplate == null ? null : string.Format(pathTemplate, "mask");
-            var dyePath = !model.HasDye || pathTemplate == null ? null : string.Format(pathTemplate, "dye");
-            var metalPath = pathTemplate == null ? null : string.Format(pathTemplate, "metal");
-            var heightPath = !model.HasHeight || pathTemplate == null ? null : string.Format(pathTemplate, "height");
-
             cfg += @$"
 		<Config>
 			<ConfigType>MODEL</ConfigType>
@@ -380,9 +372,21 @@ internal class Program
 			</Transformer>
 			<Materials>
 ";
-            if (model.Water)
+            foreach (var material in model.Materials)
             {
-                cfg += $@"
+                var diffPath = material.Diff == null ? null : relativePathMaps + material.Diff.Split("\\").Last();
+                var normPath = material.Norm == null ? null : relativePathMaps + material.Norm.Split("\\").Last();
+
+                var pathTemplate = diffPath?.Replace("_diff", "_{0}") ?? diffPath?.ReplaceNormal("{0}");
+
+                var maskPath = !material.HasMask || pathTemplate == null ? null : string.Format(pathTemplate, "mask");
+                var dyePath = !material.HasDye || pathTemplate == null ? null : string.Format(pathTemplate, "dye");
+                var metalPath = pathTemplate == null ? null : string.Format(pathTemplate, "metal");
+                var heightPath = !material.HasHeight || pathTemplate == null ? null : string.Format(pathTemplate, "height");
+
+                if (material.Water)
+                {
+                    cfg += $@"
 				<Config>
                     <ConfigType>MATERIAL</ConfigType>
                     <Name>02_water</Name>
@@ -430,24 +434,24 @@ internal class Program
                     <DisableReviveDistance>0</DisableReviveDistance>
                 </Config>
 ";
-            }
-            else
-            {
-                cfg += $@"
+                }
+                else
+                {
+                    cfg += $@"
 				<Config>
 					<ConfigType>MATERIAL</ConfigType>
 					<VertexFormat>P4h_N4b_G4b_B4b_T2h</VertexFormat>
 					<Common>Common</Common>
 					<TerrainAdaption>TerrainAdaption</TerrainAdaption>
 					<Environment>Environment</Environment>
-					{(model.Ripples ? "<WindRipples>WindRipples</WindRipples>" : "<WindRipples />")}
+					{(material.Ripples ? "<WindRipples>WindRipples</WindRipples>" : "<WindRipples />")}
 					<ShaderID>8</ShaderID>
 					<NumBonesPerVertex>0</NumBonesPerVertex>
 					<PARALLAX_MAPPING_ENABLED>1</PARALLAX_MAPPING_ENABLED>
 					<VERTEX_COLORED_TERRAIN_ADAPTION>0</VERTEX_COLORED_TERRAIN_ADAPTION>
 					<ABSOLUTE_TERRAIN_ADAPTION>0</ABSOLUTE_TERRAIN_ADAPTION>
 					<cUseLocalEnvironmentBox>1</cUseLocalEnvironmentBox>
-					<WIND_RIPPLES_ENABLED>{(model.Ripples ? "1" : "0")}</WIND_RIPPLES_ENABLED>
+					<WIND_RIPPLES_ENABLED>{(material.Ripples ? "1" : "0")}</WIND_RIPPLES_ENABLED>
 					<DisableReviveDistance>0</DisableReviveDistance>
 					<cTexScrollSpeed>0.000000</cTexScrollSpeed>
 					<cParallaxScale>1.000000</cParallaxScale>
@@ -489,6 +493,7 @@ internal class Program
 					<cEmissiveColor.b>0.8</cEmissiveColor.b>
 				</Config>
 ";
+                }
             }
 
             cfg += $@"
@@ -533,15 +538,6 @@ internal class Program
         {
             var modelPath = cloth.Model == null ? null : relativePathRdm + cloth.Model.Split("\\").Last().Replace(".gr2", ".rdm", StringComparison.OrdinalIgnoreCase);
 
-            var diffPath = cloth.Diff == null ? null : relativePathMaps + cloth.Diff.Split("\\").Last();
-            var normPath = cloth.Norm == null ? null : relativePathMaps + cloth.Norm.Split("\\").Last();
-
-            var pathTemplate = diffPath?.Replace("_diff", "_{0}") ?? diffPath?.ReplaceNormal("{0}");
-
-            var maskPath = !cloth.HasMask || pathTemplate == null ? null : string.Format(pathTemplate, "mask");
-            var dyePath = !cloth.HasDye || pathTemplate == null ? null : string.Format(pathTemplate, "dye");
-            var heightPath = !cloth.HasHeight || pathTemplate == null ? null : string.Format(pathTemplate, "height");
-
             cfg += @$"
         <Config>
             <ConfigType>CLOTH</ConfigType>
@@ -560,6 +556,19 @@ internal class Program
                 </Config>
             </Transformer>
             <Materials>
+";
+            foreach (var material in cloth.Materials)
+            {
+                var diffPath = material.Diff == null ? null : relativePathMaps + material.Diff.Split("\\").Last();
+                var normPath = material.Norm == null ? null : relativePathMaps + material.Norm.Split("\\").Last();
+
+                var pathTemplate = diffPath?.Replace("_diff", "_{0}") ?? diffPath?.ReplaceNormal("{0}");
+
+                var maskPath = !material.HasMask || pathTemplate == null ? null : string.Format(pathTemplate, "mask");
+                var dyePath = !material.HasDye || pathTemplate == null ? null : string.Format(pathTemplate, "dye");
+                var heightPath = !material.HasHeight || pathTemplate == null ? null : string.Format(pathTemplate, "height");
+
+                cfg += @$"
                 <Config>
                     <ConfigType>MATERIAL</ConfigType>
                     <Name></Name>
@@ -576,12 +585,12 @@ internal class Program
                     <cClothDyeMask>{dyePath}</cClothDyeMask>
 					<HEIGHT_MAP_ENABLED>{(heightPath != null ? "1" : "0")}</HEIGHT_MAP_ENABLED>
                     <cHeightMap>{heightPath}</cHeightMap>
-                    <cDiffuseColor.r>{(cloth.DiffColor?.R ?? 1) / 255.0}</cDiffuseColor.r>
-                    <cDiffuseColor.g>{(cloth.DiffColor?.G ?? 1) / 255.0}</cDiffuseColor.g>
-                    <cDiffuseColor.b>{(cloth.DiffColor?.B ?? 1) / 255.0}</cDiffuseColor.b>
-                    <cSpecularColor.r>{(cloth.SpecularColor?.R ?? 1) / 255.0}</cSpecularColor.r>
-                    <cSpecularColor.g>{(cloth.SpecularColor?.G ?? 1) / 255.0}</cSpecularColor.g>
-                    <cSpecularColor.b>{(cloth.SpecularColor?.B ?? 1) / 255.0}</cSpecularColor.b>
+                    <cDiffuseColor.r>{(material.DiffColor?.R ?? 1) / 255.0}</cDiffuseColor.r>
+                    <cDiffuseColor.g>{(material.DiffColor?.G ?? 1) / 255.0}</cDiffuseColor.g>
+                    <cDiffuseColor.b>{(material.DiffColor?.B ?? 1) / 255.0}</cDiffuseColor.b>
+                    <cSpecularColor.r>{(material.SpecularColor?.R ?? 1) / 255.0}</cSpecularColor.r>
+                    <cSpecularColor.g>{(material.SpecularColor?.G ?? 1) / 255.0}</cSpecularColor.g>
+                    <cSpecularColor.b>{(material.SpecularColor?.B ?? 1) / 255.0}</cSpecularColor.b>
                     <cGlossinessFactor>0.200000</cGlossinessFactor>
                     <cAlphaRef>0.100000</cAlphaRef>
                     <Atlas>Atlas</Atlas>
@@ -601,6 +610,9 @@ internal class Program
                     <ADJUST_TO_TERRAIN_HEIGHT>0</ADJUST_TO_TERRAIN_HEIGHT>
                     <DisableReviveDistance>0</DisableReviveDistance>
                 </Config>
+";
+            }
+            cfg += @$"
             </Materials>
             <Name></Name>
             <FileName>{modelPath}</FileName>
@@ -951,7 +963,7 @@ internal class Program
         }
     }
 
-    private static void ConvertModelMap<T>(string? file, string mapsFolder, bool isNormal, List<T> models, bool isProp) where T : ModelOrCloth1404
+    private static void ConvertModelMap<T>(string? file, string mapsFolder, bool isNormal, List<T> models, bool isProp) where T : ModelOrClothMaterial1404
     {
         if (string.IsNullOrWhiteSpace(file))
         {
@@ -1325,49 +1337,58 @@ internal class Program
         foreach (XmlNode? modelNode in modelNodes)
         {
             var fileName = modelNode?.GetChild("m_FileName")?.InnerText;
-            var materialNode = modelNode?.GetChildConfig("m_Materials");
+            var materialNodes = modelNode?.GetChildConfigs("m_Materials");
             var transformerNode = modelNode?.GetChildConfig("m_Transformer");
 
-            if (materialNode != null)
+            building.Models.Add(new Model1404()
             {
-                var diffuseTexture = materialNode?.GetChild("m_DiffuseTexture")?.InnerText;
-
-                building.Models.Add(new Model1404()
+                Model = fileName,
+                Position = new Vector(
+                    transformerNode?.GetChild("m_Position.x")?.GetNumber() ?? 0,
+                    transformerNode?.GetChild("m_Position.y")?.GetNumber() ?? 0,
+                    transformerNode?.GetChild("m_Position.z")?.GetNumber() ?? 0),
+                Rotation = new Quaternion(
+                    (float)(transformerNode?.GetChild("m_Rotation.x")?.GetNumber() ?? 0),
+                    (float)(transformerNode?.GetChild("m_Rotation.y")?.GetNumber() ?? 0),
+                    (float)(transformerNode?.GetChild("m_Rotation.z")?.GetNumber() ?? 0),
+                    (float)(transformerNode?.GetChild("m_Rotation.w")?.GetNumber() ?? 1)),
+                Scale = transformerNode?.GetChild("m_Scale")?.GetNumber() ?? 1,
+                Materials = materialNodes?.Select(materialNode =>
                 {
-                    Model = fileName,
-                    Diff = diffuseTexture,
-                    Norm = materialNode?.GetChild("m_NormalTexture")?.InnerText,
-                    Ripples = materialNode?.GetChild("m_RipplesEnabled")?.InnerText == "1",
-                    Water = diffuseTexture?.StartsWith("data\\graphics\\effects\\water") == true,
-                    Position = new Vector(
-                        transformerNode?.GetChild("m_Position.x")?.GetNumber() ?? 0,
-                        transformerNode?.GetChild("m_Position.y")?.GetNumber() ?? 0,
-                        transformerNode?.GetChild("m_Position.z")?.GetNumber() ?? 0),
-                    Rotation = new Quaternion(
-                        (float)(transformerNode?.GetChild("m_Rotation.x")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.y")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.z")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.w")?.GetNumber() ?? 1)),
-                    Scale = transformerNode?.GetChild("m_Scale")?.GetNumber() ?? 1
-                });
-            }
+                    var diffuseTexture = materialNode?.GetChild("m_DiffuseTexture")?.InnerText;
+                    return new ModelMaterial1404()
+                    {
+                        Diff = diffuseTexture,
+                        Norm = materialNode?.GetChild("m_NormalTexture")?.InnerText,
+                        Ripples = materialNode?.GetChild("m_RipplesEnabled")?.InnerText == "1",
+                        Water = diffuseTexture?.StartsWith("data\\graphics\\effects\\water") == true
+                    };
+                }).ToList() ?? []
+            });
         }
 
         var clothesNodes = mainConfig?.GetChildConfigs("m_Clothes") ?? new List<XmlNode?>();
         foreach (var clothesNode in clothesNodes)
         {
             var fileName = clothesNode?.GetChild("m_FileName")?.InnerText;
-            var materialNode = clothesNode?.GetChildConfig("m_Materials");
+            var materialNodes = clothesNode?.GetChildConfigs("m_Materials");
             var transformerNode = clothesNode?.GetChildConfig("m_Transformer");
 
-            if (materialNode != null)
+            building.Clothes.Add(new Cloth1404()
             {
-                var diffuseTexture = materialNode?.GetChild("m_DiffuseTexture")?.InnerText;
-
-                building.Clothes.Add(new Cloth1404()
+                Model = fileName,
+                Position = new Vector(
+                        transformerNode?.GetChild("m_Position.x")?.GetNumber() ?? 0,
+                        transformerNode?.GetChild("m_Position.y")?.GetNumber() ?? 0,
+                        transformerNode?.GetChild("m_Position.z")?.GetNumber() ?? 0),
+                Rotation = new Quaternion(
+                        (float)(transformerNode?.GetChild("m_Rotation.x")?.GetNumber() ?? 0),
+                        (float)(transformerNode?.GetChild("m_Rotation.y")?.GetNumber() ?? 0),
+                        (float)(transformerNode?.GetChild("m_Rotation.z")?.GetNumber() ?? 0),
+                        (float)(transformerNode?.GetChild("m_Rotation.w")?.GetNumber() ?? 1)),
+                Materials = materialNodes?.Select(materialNode => new ClothMaterial1404()
                 {
-                    Model = fileName,
-                    Diff = diffuseTexture,
+                    Diff = materialNode?.GetChild("m_DiffuseTexture")?.InnerText,
                     Norm = materialNode?.GetChild("m_NormalTexture")?.InnerText,
                     DiffColor = System.Drawing.Color.FromArgb(
                         (int)((materialNode?.GetChild("m_DiffuseColor.r")?.GetNumber() ?? 1) * 255),
@@ -1376,18 +1397,9 @@ internal class Program
                     SpecularColor = System.Drawing.Color.FromArgb(
                         (int)((materialNode?.GetChild("m_SpecularColor.r")?.GetNumber() ?? 1) * 255),
                         (int)((materialNode?.GetChild("m_SpecularColor.g")?.GetNumber() ?? 1) * 255),
-                        (int)((materialNode?.GetChild("m_SpecularColor.b")?.GetNumber() ?? 1) * 255)),
-                    Position = new Vector(
-                        transformerNode?.GetChild("m_Position.x")?.GetNumber() ?? 0,
-                        transformerNode?.GetChild("m_Position.y")?.GetNumber() ?? 0,
-                        transformerNode?.GetChild("m_Position.z")?.GetNumber() ?? 0),
-                    Rotation = new Quaternion(
-                        (float)(transformerNode?.GetChild("m_Rotation.x")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.y")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.z")?.GetNumber() ?? 0),
-                        (float)(transformerNode?.GetChild("m_Rotation.w")?.GetNumber() ?? 1)),
-                });
-            }
+                        (int)((materialNode?.GetChild("m_SpecularColor.b")?.GetNumber() ?? 1) * 255))
+                }).ToList() ?? []
+            });
         }
 
         foreach (var groundNode in mainConfig?.GetChildConfigs("m_TerrainDecals") ?? new List<XmlNode?>())

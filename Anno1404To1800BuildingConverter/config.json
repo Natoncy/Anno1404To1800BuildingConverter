@@ -2,7 +2,7 @@
   // Path to data folder for 1404
   "DataPath1404": "D:\\anno_data\\1404\\",
   // Path to data folder of the mod
-  "DataPathMod": "C:\\Users\\User\\Documents\\Anno 1800\\mods\\[Example] Your mod\\",
+  "DataPathMod": "C:\\Users\\Max\\Documents\\Anno 1800\\mods\\[Addon] Return to the Orient\\",
   // Path to data folder for 1800, in case you want to copy it there too (optional)
   "DataPath1800": "D:\\anno_data\\1800\\",
 
@@ -27,6 +27,8 @@
   // Missing particles in the dictionary will be logged in console and can be added here
   // If none are found then the particle will not be added
   "ParticleMappings": {
+    "data\\graphics\\effects\\particles\\oltr_boilinggreenstuff.efc": "data\\graphics\\effects\\particles\\water\\water_fountain01.rdp",
+    "data\\graphics\\effects\\particles\\n_fire_03.efc": "data\\graphics\\effects\\particles\\water\\water_fountain01.rdp",
     "data\\graphics\\effects\\particles\\fountain_lightfoam.efc": "data\\graphics\\effects\\particles\\water\\water_fountain01.rdp",
     "data\\graphics\\effects\\particles\\n_smoke_02.efc": "data\\graphics\\effects\\particles\\smoke_fog_steam\\smoke_light_02_loop.rdp",
     "data\\graphics\\effects\\particles\\smokewater.efc": "data\\graphics\\effects\\particles\\fire_explosion\\heat_fire_large_01_loop.rdp",
@@ -75,40 +77,62 @@
     "n_corsair_harbour_building_03_cloth": [ 1, 2, 4, 5 ], // corsair_harbour_building_03
     "n_corsair_harbour_flags": [ 0, 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18 ], // corsair_harbour_building_03
     "n_corsair_harbour_line02": [ 1, 2, 5, 6, 8, 13, 14, 16, 17, 19, 22, 23 ], // corsair_harbour
-    "n_corsair_harbour_lines": [ 6, 7, 14, 17, 18, 21, 22, 25, 26, 29, 36, 37, 40, 41, 44, 45, 48, 49, 52, 53, 56, 57, 58, 59, 60, 61, 62, 63 ] // corsair_harbour
+    "n_corsair_harbour_lines": [ 6, 7, 14, 17, 18, 21, 22, 25, 26, 29, 36, 37, 40, 41, 44, 45, 48, 49, 52, 53, 56, 57, 58, 59, 60, 61, 62, 63 ], // corsair_harbour
+
+    "n_weaver_hut_cloth": [ 0, 1, 5, 6, 9, 10, 13, 14, 16, 19, 21, 22 ], // weaver_hut
+    "n_flag02_var01": [ 0, 1, 2, 3 ] // n_flagpole05
   },
 
   // Paths to the buildings that should be converted
   "Paths": [
     // Orient
-    { "Path": "data\\graphics\\buildings\\factory\\south" },
-    { "Path": "data\\graphics\\buildings\\farm\\south" },
-    { "Path": "data\\graphics\\buildings\\farm\\north\\spice_farm" },
-    { "Path": "data\\graphics\\buildings\\military\\south" },
-    { "Path": "data\\graphics\\buildings\\mine\\south" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\south" },
+    //{ "Path": "data\\graphics\\buildings\\farm\\south" },
+    //{ "Path": "data\\graphics\\buildings\\farm\\north\\spice_farm" },
+    //{ "Path": "data\\graphics\\buildings\\military\\south" },
+    //{ "Path": "data\\graphics\\buildings\\mine\\south" },
     { "Path": "data\\graphics\\buildings\\native\\south" },
-    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour" },
-    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_01" },
-    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_02" },
-    { "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_03" },
-    { "Path": "data\\graphics\\buildings\\ornament\\south" },
-    { "Path": "data\\graphics\\buildings\\public\\south" },
-    { "Path": "data\\graphics\\buildings\\residence\\south" },
-    { "Path": "data\\graphics\\buildings\\ornament\\north\\decoration_objects\\n_decoration_palm.cfg" },
-    {
-      "Path": "data\\graphics\\props",
-      "IsProp": true
-    },
-    {
-      "Path": "data\\graphics\\buildings\\native\\south\\orient_harbour_building",
-      "IsProp": true,
-      "DoNotAdjustToTerrainHeight": true
-    },
-    {
-      "Path": "data\\graphics\\buildings\\public\\south\\oriental_market_building",
-      "IsProp": true,
-      "DoNotAdjustToTerrainHeight": true
-    },
+    //{ "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour" },
+    //{ "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_01" },
+    //{ "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_02" },
+    //{ "Path": "data\\graphics\\buildings\\native\\north\\corsair_harbour_building_03" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\south" },
+    //{ "Path": "data\\graphics\\buildings\\public\\south" },
+    //{ "Path": "data\\graphics\\buildings\\residence\\south" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\north\\decoration_objects\\n_decoration_palm.cfg" },
+    //{
+    //  "Path": "data\\graphics\\props",
+    //  "IsProp": true
+    //},
+    //{
+    //  "Path": "data\\graphics\\buildings\\native\\south\\orient_harbour_building",
+    //  "IsProp": true,
+    //  "DoNotAdjustToTerrainHeight": true
+    //},
+    //{
+    //  "Path": "data\\graphics\\buildings\\public\\south\\oriental_market_building",
+    //  "IsProp": true,
+    //  "DoNotAdjustToTerrainHeight": true
+    //},
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\market_place_element01\\n_market_place_element01.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\market_place_element02\\n_market_place_element02.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\market_place_element03\\n_market_place_element03.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\market_place_element04\\n_market_place_element04.cfg" },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Everything
     //{ "Path": "data\\graphics\\buildings" },
@@ -120,7 +144,36 @@
     // Testing
     //{ "Path": "data\\graphics\\buildings\\residence\\south\\nomad_house" },
 
+    // Satanoy
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\bailiwick" },
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\hospice" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\bakery" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\barrel_cooperage" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\butchers_shop" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\candlemakers_workshop" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\glass_smelter" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\monastery_brewery" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\north\\weaver_hut" },
+    //{ "Path": "data\\graphics\\buildings\\farm\\north\\hemp_plantation" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\south\\confectioner" },
+    //{ "Path": "data\\graphics\\buildings\\factory\\south\\perfumery" },
+    //{ "Path": "data\\graphics\\buildings\\farm\\south\\rose_nursery" },
+    //{
+    //  "Path": "data\\graphics\\props",
+    //  "IsProp": true
+    //},
 
+
+
+    //{ "Path": "data\\graphics\\buildings\\public\\north\\market_place01" },
+    //{ "Path": "data\\graphics\\buildings\\public\\south\\bazaar" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\south\\market_stand\\s_market_stand_01.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\south\\market_stand\\s_market_stand_02.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\north\\market_stand\\n_market_stand01.cfg" },
+    //{ "Path": "data\\graphics\\buildings\\ornament\\north\\market_stand\\n_market_stand02.cfg" },
+
+    //{ "Path": "addondata\\graphics\\buildings\\native\\venetian_market_stand_01\\n_venetian_market_stand_01.cfg" },
+    //{ "Path": "addondata\\graphics\\buildings\\native\\venetian_market_stand_02\\n_venetian_market_stand_02.cfg" },
 
     {}
   ]

@@ -31,7 +31,7 @@ This will get you most of the way to a usable building in 1800, but there are so
 
 1. Vegetation like trees as part of the model
 2. Specific feedback unit paths (General feedback blockers for randomly spawning units do work)
-3. Building animations
+3. Animations
 
 ## Setup
 
